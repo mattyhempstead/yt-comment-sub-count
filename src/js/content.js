@@ -73,15 +73,16 @@ onChildLoad(document.querySelector('ytd-comments#comments'), 'ytd-item-section-r
       mutationsList.forEach(mutation => {
         mutation.addedNodes.forEach(async el => {
           if (el.tagName !== 'YTD-COMMENT-THREAD-RENDERER') return;
-          const channelUrl = el.querySelector('div#author-thumbnail > a').href;
-          const subs = await getSubs(channelUrl);
-
+          
           const commentHeaderElement = el.querySelector('div#header-author');
 
           // Remove any existing subscriber counts
           commentHeaderElement.querySelectorAll('.subscriber-count').forEach(el => {
             commentHeaderElement.removeChild(el);
           });
+
+          const channelUrl = el.querySelector('div#author-thumbnail > a').href;
+          const subs = await getSubs(channelUrl);
 
           // Add new subscriber count
           const subCounterSpan = document.createElement('span');
