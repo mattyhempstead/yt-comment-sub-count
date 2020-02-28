@@ -23,7 +23,7 @@ const getSubs = async (channelUrl) => {
   const subEndIndex = text.indexOf('"', subStartIndex);
 
   const subString = text.substring(subStartIndex, subEndIndex);
-  return subString;
+  return subString.split(' ')[0];
 }
 
 
@@ -78,7 +78,7 @@ onChildLoad(document.querySelector('ytd-comments#comments'), 'ytd-item-section-r
 
           const subCounterSpan = document.createElement('span');
           el.querySelector('div#header-author').appendChild(subCounterSpan);
-          subCounterSpan.innerHTML = `${subs} sub${subs !== 1 && 's'}`;
+          subCounterSpan.innerHTML = `${subs} subscriber${subs !== 1 && 's'}`;
           subCounterSpan.style.fontSize = '1.1em';
           subCounterSpan.style.color = '#ddd';
           subCounterSpan.style.backgroundColor = '#333';
