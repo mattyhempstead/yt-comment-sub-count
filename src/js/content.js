@@ -76,8 +76,17 @@ onChildLoad(document.querySelector('ytd-comments#comments'), 'ytd-item-section-r
           const channelUrl = el.querySelector('div#author-thumbnail > a').href;
           const subs = await getSubs(channelUrl);
 
+          const commentHeaderElement = el.querySelector('div#header-author');
+
+          // Remove any existing subscriber counts
+          commentHeaderElement.querySelectorAll('.subscriber-count').forEach(el => {
+            commentHeaderElement.removeChild(el);
+          });
+
+          // Add new subscriber count
           const subCounterSpan = document.createElement('span');
-          el.querySelector('div#header-author').appendChild(subCounterSpan);
+          commentHeaderElement.appendChild(subCounterSpan);
+          subCounterSpan.className = 'subscriber-count';
           subCounterSpan.innerHTML = `${subs} subscriber${subs === '1' ? '' : 's'}`;
           subCounterSpan.style.fontSize = '1.1em';
           subCounterSpan.style.color = '#ddd';
