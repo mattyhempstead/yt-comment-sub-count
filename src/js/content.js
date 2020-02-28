@@ -1,3 +1,5 @@
+console.log('Commenter Subs');
+
 /**
  * Returns the subscriber count string of a given youtube channel
  * @param {string} channelUrl the url of a given youtube channel
@@ -25,27 +27,67 @@ const getSubs = async (channelUrl) => {
 }
 
 
-const targetNode = document.querySelector('ytd-item-section-renderer#sections > div#contents');
-const config = { childList: true };
+/**
+ * Returns a promise which will resolve when a given child element has loaded
+ * that satisfies a particular query selector.  
+ * This function will return even if the element already exists before the
+ * listener was created.
+ * @param {HTMLElement} targetElement the element to listen from (the parent)
+ * @param {string} query a css selector query for the desired element
+ * @param {boolean} subtree whether to consider more than just direct children
+ */
+const onChildLoad = (targetElement, query, subtree=false) => {
+  return new Promise(res => {
+    // Check if element already exists in the targetElement
+    const existingElement = targetElement.querySelector(
+      (subtree ? ':scope > ' : '') + query
+    );
+    if (existingElement !== null) {
+      res(existingElement);
+      return;
+    }
 
-const observer = new MutationObserver((mutationsList) => {    
-  mutationsList.forEach(mutation => {
-    mutation.addedNodes.forEach(async el => {
-      if (el.tagName !== 'YTD-COMMENT-THREAD-RENDERER') return;
-      const channelUrl = el.querySelector('div#author-thumbnail > a').href;
-      const subs = await getSubs(channelUrl);
-
-      const subCounterSpan = document.createElement('span');
-      el.querySelector('div#header-author').appendChild(subCounterSpan);
-      subCounterSpan.innerHTML = `${subs} sub${subs !== 1 && 's'}`;
-      subCounterSpan.style.fontSize = '1.1em';
-      subCounterSpan.style.color = '#ddd';
-      subCounterSpan.style.backgroundColor = '#333';
-      subCounterSpan.style.marginLeft = '4px';
-      subCounterSpan.style.padding = '1px 3px 1px 3px';
-      subCounterSpan.style.borderRadius = '3px';
+    // Otherwise create a listener on the targetElement
+    const observer = new MutationObserver(mutationsList => {
+      mutationsList.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          // Return first node which matches selector
+          if (node.matches && node.matches(query)) {
+            observer.disconnect();
+            res(node);
+          }
+        })
+      })
     })
+    observer.observe(targetElement, {childList: true, subtree: subtree})
   })
-});
+}
 
-observer.observe(targetNode, config);
+
+// Wait until comment section loads contents div before creating comment listener
+onChildLoad(document.querySelector('ytd-comments#comments'), 'ytd-item-section-renderer#sections')
+  .then(targetNode => targetNode.querySelector('div#contents'))
+  .then(targetNode => {
+    // Listen for comments
+    const observer = new MutationObserver((mutationsList) => {    
+      mutationsList.forEach(mutation => {
+        mutation.addedNodes.forEach(async el => {
+          if (el.tagName !== 'YTD-COMMENT-THREAD-RENDERER') return;
+          const channelUrl = el.querySelector('div#author-thumbnail > a').href;
+          const subs = await getSubs(channelUrl);
+
+          const subCounterSpan = document.createElement('span');
+          el.querySelector('div#header-author').appendChild(subCounterSpan);
+          subCounterSpan.innerHTML = `${subs} sub${subs !== 1 && 's'}`;
+          subCounterSpan.style.fontSize = '1.1em';
+          subCounterSpan.style.color = '#ddd';
+          subCounterSpan.style.backgroundColor = '#333';
+          subCounterSpan.style.marginLeft = '4px';
+          subCounterSpan.style.padding = '1px 3px 1px 3px';
+          subCounterSpan.style.borderRadius = '3px';
+        })
+      })
+    });
+
+    observer.observe(targetNode, {childList: true});
+  })

@@ -1,0 +1,25 @@
+{
+    "name": "Commenter Subscribers for YouTube™",
+    "description": "Displays the number of Youtube subscribers next to each comment.",
+    "version": "1.0.0",
+    "manifest_version": 2,
+    "icons": {
+        "32": "icons/icon32.png",
+        "48": "icons/icon48.png",
+        "64": "icons/icon64.png",
+        "128": "icons/icon128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.youtube.com/watch?*",
+                "http://www.youtube.com/watch?*"
+            ],
+            "js": [
+                "js/content.js"
+            ],
+            "all_frames": true,
+            "run_at": "document_idle"
+        }
+    ]
+}
