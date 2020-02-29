@@ -1,7 +1,8 @@
 console.log('Commenter Subs');
 
 /**
- * Returns the subscriber count string of a given youtube channel
+ * Returns the subscriber count string of a given youtube channel.  
+ * If subscriber count is private, '0 subscribers' is returned.
  * @param {string} channelUrl the url of a given youtube channel
  *  Should be of the form *https://www.youtube.com/channel/<channel id>*
  */
@@ -22,8 +23,9 @@ const getSubs = async (channelUrl) => {
   );
   const subEndIndex = text.indexOf('"', subStartIndex);
 
-  const subString = text.substring(subStartIndex, subEndIndex);
-  return subString.split(' ')[0];
+  let subCount = text.substring(subStartIndex, subEndIndex).split(' ')[0];
+  if (isNaN(subCount)) subCount = '0';
+  return `${subCount} subscriber${subCount === '1' ? '' : 's'}`;
 }
 
 
@@ -82,13 +84,13 @@ onChildLoad(document.querySelector('ytd-app'), 'ytd-item-section-renderer#sectio
           });
 
           const channelUrl = el.querySelector('div#author-thumbnail > a').href;
-          const subs = await getSubs(channelUrl);
+          const subCount = await getSubs(channelUrl);
 
           // Add new subscriber count
           const subCounterSpan = document.createElement('span');
           commentHeaderElement.appendChild(subCounterSpan);
           subCounterSpan.className = 'subscriber-count';
-          subCounterSpan.innerHTML = `${subs} subscriber${subs === '1' ? '' : 's'}`;
+          subCounterSpan.innerHTML = subCount;
           subCounterSpan.style.fontSize = '1.1em';
           subCounterSpan.style.color = '#ddd';
           subCounterSpan.style.backgroundColor = '#333';
