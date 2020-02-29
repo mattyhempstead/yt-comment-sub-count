@@ -65,7 +65,7 @@ const onChildLoad = (targetElement, query, subtree=false) => {
 
 
 // Wait until comment section loads contents div before creating comment listener
-onChildLoad(document.querySelector('ytd-comments#comments'), 'ytd-item-section-renderer#sections')
+onChildLoad(document.querySelector('ytd-app'), 'ytd-item-section-renderer#sections', true)
   .then(targetNode => targetNode.querySelector('div#contents'))
   .then(targetNode => {
     // Listen for comments
