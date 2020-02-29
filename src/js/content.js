@@ -42,7 +42,7 @@ const onChildLoad = (targetElement, query, subtree=false) => {
   return new Promise(res => {
     // Check if element already exists in the targetElement
     const existingElement = targetElement.querySelector(
-      (subtree ? ':scope > ' : '') + query
+      (subtree ? '' : ':scope > ') + query
     );
     if (existingElement !== null) {
       res(existingElement);

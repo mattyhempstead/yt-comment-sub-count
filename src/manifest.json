@@ -1,7 +1,7 @@
 {
     "name": "Commenter Subscribers for YouTube™",
     "description": "Displays the number of Youtube subscribers next to each comment.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "manifest_version": 2,
     "icons": {
         "32": "icons/icon32.png",
