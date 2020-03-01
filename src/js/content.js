@@ -30,76 +30,48 @@ const getSubs = async (channelUrl) => {
 
 
 /**
- * Returns a promise which will resolve when a given child element has loaded
- * that satisfies a particular query selector.  
- * This function will return even if the element already exists before the
- * listener was created.
- * @param {HTMLElement} targetElement the element to listen from (the parent)
- * @param {string} query a css selector query for the desired element
- * @param {boolean} subtree whether to consider more than just direct children
+ * Adds the sub count to a given comment element.
+ * If the comment already has a sub count, this is removed first.
+ * @param {HTMLElement} commentElement the comment element <ytd-comment-renderer>
  */
-const onChildLoad = (targetElement, query, subtree=false) => {
-  return new Promise(res => {
-    // Check if element already exists in the targetElement
-    const existingElement = targetElement.querySelector(
-      (subtree ? '' : ':scope > ') + query
-    );
-    if (existingElement !== null) {
-      res(existingElement);
-      return;
-    }
+const addCommentSubCount = async commentElement => {
+  const commentHeaderElement = commentElement.querySelector('div#header-author');
 
-    // Otherwise create a listener on the targetElement
-    const observer = new MutationObserver(mutationsList => {
-      mutationsList.forEach(mutation => {
-        mutation.addedNodes.forEach(node => {
-          // Return first node which matches selector
-          if (node.matches && node.matches(query)) {
-            observer.disconnect();
-            res(node);
-          }
-        })
-      })
-    })
-    observer.observe(targetElement, {childList: true, subtree: subtree})
-  })
+  // Remove any existing subscriber counts
+  commentHeaderElement.querySelectorAll('.subscriber-count').forEach(el => {
+    commentHeaderElement.removeChild(el);
+  });
+
+  const channelUrl = commentElement.querySelector('div#author-thumbnail > a').href;
+  const subCount = await getSubs(channelUrl);
+
+  // Add new subscriber count
+  const subCounterSpan = document.createElement('span');
+  commentHeaderElement.appendChild(subCounterSpan);
+  subCounterSpan.className = 'subscriber-count';
+  subCounterSpan.innerHTML = subCount;
+  subCounterSpan.style.fontSize = '1.1rem';
+  subCounterSpan.style.lineHeight = 'normal';
+  subCounterSpan.style.color = '#ddd';
+  subCounterSpan.style.backgroundColor = '#333';
+  subCounterSpan.style.marginLeft = '4px';
+  subCounterSpan.style.padding = '1px 3px 1px 3px';
+  subCounterSpan.style.borderRadius = '3px';
 }
 
 
-// Wait until comment section loads contents div before creating comment listener
-onChildLoad(document.querySelector('ytd-app'), 'ytd-item-section-renderer#sections', true)
-  .then(targetNode => targetNode.querySelector('div#contents'))
-  .then(targetNode => {
-    // Listen for comments
-    const observer = new MutationObserver((mutationsList) => {    
-      mutationsList.forEach(mutation => {
-        mutation.addedNodes.forEach(async el => {
-          if (el.tagName !== 'YTD-COMMENT-THREAD-RENDERER') return;
-          
-          const commentHeaderElement = el.querySelector('div#header-author');
-
-          // Remove any existing subscriber counts
-          commentHeaderElement.querySelectorAll('.subscriber-count').forEach(el => {
-            commentHeaderElement.removeChild(el);
-          });
-
-          const channelUrl = el.querySelector('div#author-thumbnail > a').href;
-          const subCount = await getSubs(channelUrl);
-
-          // Add new subscriber count
-          const subCounterSpan = document.createElement('span');
-          commentHeaderElement.appendChild(subCounterSpan);
-          subCounterSpan.className = 'subscriber-count';
-          subCounterSpan.innerHTML = subCount;
-          subCounterSpan.style.fontSize = '1.1em';
-          subCounterSpan.style.color = '#ddd';
-          subCounterSpan.style.backgroundColor = '#333';
-          subCounterSpan.style.marginLeft = '4px';
-          subCounterSpan.style.padding = '1px 3px 1px 3px';
-          subCounterSpan.style.borderRadius = '3px';
-        })
-      })
-    });
-
-    observer.observe(targetNode, {childList: true});
+// Create an observer to listen for any new comment elements
+const observer = new MutationObserver((mutationsList) => {    
+  mutationsList.forEach(mutation => {
+    mutation.addedNodes.forEach(el => {
+      if (el.tagName !== 'YTD-COMMENT-RENDERER') return;
+      addCommentSubCount(el);
+    })
   })
+});
+
+// Listen for comments on an element which always starts loaded
+observer.observe(
+  document.querySelector('ytd-app'),
+  {childList: true, subtree: true}
+);
