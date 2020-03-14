@@ -10,21 +10,27 @@ const getSubs = async (channelUrl) => {
   const response = await fetch(channelUrl + '/about');
   const text = await response.text();
 
-  // Get start and end index of subscriber count string
-  const subStartIndex = 14 + text.indexOf(
-    '"simpleText"',
+  // Get start of subscriber count string
+  let subStartIndex = text.indexOf(
+    '"subscriberCountText"',
     text.indexOf(
-      '"subscriberCountText"',
-      text.indexOf(
-        '"c4TabbedHeaderRenderer"',
-        text.indexOf('window["ytInitialData"]')
-      )
+      '"c4TabbedHeaderRenderer"',
+      text.indexOf('window["ytInitialData"]')
     )
   );
+
+  // User has set their subscriber count to private
+  if (subStartIndex === -1) return '<i>Private</i>';
+  
+  subStartIndex = 14 + text.indexOf(
+    '"simpleText"',
+    subStartIndex
+  );
+
+  // Get end of subscriber string
   const subEndIndex = text.indexOf('"', subStartIndex);
 
   let subCount = text.substring(subStartIndex, subEndIndex).split(' ')[0];
-  if (isNaN(subCount)) subCount = '0';
   return `${subCount} subscriber${subCount === '1' ? '' : 's'}`;
 }
 
