@@ -5,9 +5,9 @@
 
   /**
    * Returns the subscriber count string of a given youtube channel.  
-   * If subscriber count is private, '0 subscribers' is returned.
-   * @param {string} channelUrl the url of a given youtube channel
-   *  Should be of the form *https://www.youtube.com/channel/<channel id>*
+   * If subscriber count is private, "*Private*" is returned.
+   * @param {string} channelUrl the url of a given youtube channel. 
+   * Should be of the form *https://www.youtube.com/channel/<channel id>*
    */
   const getSubs = async (channelUrl) => {
     const response = await fetch(channelUrl + '/about');
