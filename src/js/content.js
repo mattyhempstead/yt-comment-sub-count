@@ -1,7 +1,5 @@
 (()=>{
-  console.log('Commenter Subs');
-
-  if (document.location.pathname !== '/watch') return;
+  console.log('Commenter Subscribers for YouTube™');
 
   /**
    * Returns the subscriber count string of a given youtube channel.  
