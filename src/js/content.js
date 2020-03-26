@@ -64,6 +64,33 @@
     subCounterSpan.style.marginLeft = '4px';
     subCounterSpan.style.padding = '1px 3px 1px 3px';
     subCounterSpan.style.borderRadius = '3px';
+
+
+    /*
+      When navigating between videos, comment elements are not recreated and so
+      addCommentSubCount is not triggered. This means the subscriber count will
+      represent that of a channel from a previous video instead of the current.
+
+      To fix this, we listen for changes to the href of the comment to trigger
+      and update to the subscriber count.
+    */
+    const observer = new MutationObserver(mutationsList => {   
+      mutationsList
+        .filter(mutation => mutation.type === 'attributes' && mutation.attributeName === 'href')
+        .forEach(async () => {
+          // Hide element while we fetch new subscriber count
+          subCounterSpan.style.visibility = 'hidden';
+          const channelUrl = commentElement.querySelector('div#author-thumbnail > a').href;
+          subCounterSpan.innerHTML = await getSubs(channelUrl);
+          subCounterSpan.style.visibility = 'visible';
+        })
+    });
+
+    observer.observe(
+      commentElement.querySelector('div#author-thumbnail > a'),
+      {childList: false, subtree: false, attributes: true}
+    );
+
   }
 
 
