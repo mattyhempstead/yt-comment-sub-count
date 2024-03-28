@@ -20,5 +20,10 @@
             "all_frames": true,
             "run_at": "document_end"
         }
-    ]
+    ],
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "{07372fe3-6650-4175-aae3-057f2d75ef8d}"
+        }
+    }
 }
