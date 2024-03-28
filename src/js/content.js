@@ -98,7 +98,10 @@
   const observer = new MutationObserver((mutationsList) => {    
     mutationsList.forEach(mutation => {
       mutation.addedNodes.forEach(el => {
-        if (el.tagName !== 'YTD-COMMENT-THREAD-RENDERER') return;
+        // YTD-COMMENT-THREAD-RENDERER appears to be the correct tagName as of 2024-03-28.
+        // I will temporarily leave YTD-COMMENT-RENDERER in case this change hasn't rolled out to all.
+        if (el.tagName !== 'YTD-COMMENT-RENDERER'
+         && el.tagName !== 'YTD-COMMENT-THREAD-RENDERER') return;
         addCommentSubCount(el);
       })
     })
