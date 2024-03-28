@@ -98,7 +98,7 @@
   const observer = new MutationObserver((mutationsList) => {    
     mutationsList.forEach(mutation => {
       mutation.addedNodes.forEach(el => {
-        if (el.tagName !== 'YTD-COMMENT-RENDERER') return;
+        if (el.tagName !== 'YTD-COMMENT-THREAD-RENDERER') return;
         addCommentSubCount(el);
       })
     })
