@@ -3,35 +3,32 @@
 
   /**
    * Returns the subscriber count string of a given youtube channel.  
-   * If subscriber count is private, "*Private*" is returned.
+   * If subscriber count is private, <i>Private</i> is returned.
    * @param {string} channelUrl the url of a given youtube channel. 
-   * Should be of the form *https://www.youtube.com/channel/<channel id>*
+   * Should be of the form: https://www.youtube.com/channel/<channel id>
    */
   const getSubs = async (channelUrl) => {
     const response = await fetch(channelUrl + '/about');
     const text = await response.text();
 
-    // Get start of subscriber count string
-    let subStartIndex = text.indexOf(
-      '"subscriberCountText"',
-      text.indexOf(
-        '"c4TabbedHeaderRenderer"',
-        text.indexOf('window["ytInitialData"]')
-      )
-    );
+    // Get start of subscriber count string.
+    // The returned HTML contains a large JSON that has the sub count as
+    // a rendered string in a field called "subscriberCountText".
+    // e.g. ... "subscriberCountText":"12.4K subscribers" ...
 
-    // User has set their subscriber count to private
-    if (subStartIndex === -1) return '<i>Private</i>';
-    
-    subStartIndex = 14 + text.indexOf(
-      '"simpleText"',
-      subStartIndex
-    );
+    // We just do a regex to find it for now
+    const regex = /"subscriberCountText":"[a-zA-Z0-9.]+ subscribers"/;
+    const match = text.match(regex);
 
-    // Get end of subscriber string
-    const subEndIndex = text.indexOf('"', subStartIndex);
+    // User has set their subscriber count to private.
+    // We detect this if the subscriberCountText field is missing.
+    if (match === null) return '<i>Private</i>';
 
-    let subCount = text.substring(subStartIndex, subEndIndex).split(' ')[0];
+    // We now have a string like: "subscriberCountText":"2 subscribers"
+    // We extract the "2 subscribers" part as a string
+    let subCountStringRaw = match[0].substring(23, match[0].length-1);
+
+    let subCount = subCountStringRaw.split(' ')[0];
     return `${subCount} subscriber${subCount === '1' ? '' : 's'}`;
   }
 
