@@ -17,7 +17,7 @@
     // e.g. ... "subscriberCountText":"12.4K subscribers" ...
 
     // We just do a regex to find it for now
-    const regex = /"subscriberCountText":"[a-zA-Z0-9.]+ subscribers"/;
+    const regex = /"subscriberCountText":"([^"]+)"/;
     const match = text.match(regex);
 
     // User has set their subscriber count to private.
@@ -25,11 +25,8 @@
     if (match === null) return '<i>Private</i>';
 
     // We now have a string like: "subscriberCountText":"2 subscribers"
-    // We extract the "2 subscribers" part as a string
-    let subCountStringRaw = match[0].substring(23, match[0].length-1);
-
-    let subCount = subCountStringRaw.split(' ')[0];
-    return `${subCount} subscriber${subCount === '1' ? '' : 's'}`;
+    // with the count in match group 1, so return just that.
+    return match[1];
   }
 
 
