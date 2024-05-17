@@ -11,7 +11,7 @@
     const response = await fetch(channelUrl + '/about');
     const text = await response.text();
 
-    // Get start of subscriber count string.
+    // Get subscriber count string.
     // The returned HTML contains a large JSON that has the sub count as
     // a rendered string in a field called "subscriberCountText".
     // e.g. ... "subscriberCountText":"12.4K subscribers" ...
@@ -33,7 +33,7 @@
   /**
    * Adds the sub count to a given comment element.
    * If the comment already has a sub count, this is removed first.
-   * @param {HTMLElement} commentElement the comment element <ytd-comment-renderer>
+   * @param {HTMLElement} commentElement an element which contains a single comment
    */
   const addCommentSubCount = async commentElement => {
     const commentHeaderElement = commentElement.querySelector('div#header-author');
@@ -92,13 +92,12 @@
   const observer = new MutationObserver((mutationsList) => {    
     mutationsList.forEach(mutation => {
       mutation.addedNodes.forEach(el => {
-        // YTD-COMMENT-THREAD-RENDERER appears to be the correct tagName as of 2024-03-28.
-        // I will temporarily leave YTD-COMMENT-RENDERER in case this change hasn't rolled out to all.
-        if (el.tagName !== 'YTD-COMMENT-RENDERER'
-         && el.tagName !== 'YTD-COMMENT-THREAD-RENDERER') return;
-        addCommentSubCount(el);
-      })
-    })
+        // YTD-COMMENT-VIEW-MODEL appears to be a tag that wraps a single comment or reply
+        if (el.tagName === 'YTD-COMMENT-VIEW-MODEL') {
+          addCommentSubCount(el);
+        }
+      });
+    });
   });
 
   // Listen for comments on an element which always starts loaded
