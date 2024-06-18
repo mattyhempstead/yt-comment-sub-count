@@ -36,6 +36,8 @@
    * @param {HTMLElement} commentElement an element which contains a single comment
    */
   const addCommentSubCount = async commentElement => {
+    const newCommentStructure = !commentElement.querySelector('div#author-thumbnail > a').href;
+    const channelUrlLookup = newCommentStructure ? 'div#header-author a' : 'div#author-thumbnail > a';
     const commentHeaderElement = commentElement.querySelector('div#header-author');
 
     // Remove any existing subscriber counts
@@ -43,7 +45,7 @@
       commentHeaderElement.removeChild(el);
     });
 
-    const channelUrl = commentElement.querySelector('div#author-thumbnail > a').href;
+    const channelUrl = commentElement.querySelector(channelUrlLookup).href;
     const subCount = await getSubs(channelUrl);
 
     // Add new subscriber count
@@ -74,14 +76,14 @@
         .forEach(async () => {
           // Hide element while we fetch new subscriber count
           subCounterSpan.style.visibility = 'hidden';
-          const channelUrl = commentElement.querySelector('div#author-thumbnail > a').href;
+          const channelUrl = commentElement.querySelector(channelUrlLookup).href;
           subCounterSpan.innerHTML = await getSubs(channelUrl);
           subCounterSpan.style.visibility = 'visible';
         })
     });
 
     observer.observe(
-      commentElement.querySelector('div#author-thumbnail > a'),
+      commentElement.querySelector(channelUrlLookup),
       {childList: false, subtree: false, attributes: true}
     );
 
