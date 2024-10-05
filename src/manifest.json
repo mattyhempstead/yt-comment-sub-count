@@ -1,7 +1,7 @@
 {
     "name": "Subscriber Count on Comments for YouTube™",
     "description": "Displays the number of YouTube™ subscribers next to each comment under every video.",
-    "version": "1.1.12",
+    "version": "1.1.13",
     "manifest_version": 3,
     "icons": {
         "48": "icons/icon48.png",
@@ -17,7 +17,7 @@
             "js": [
                 "js/content.js"
             ],
-            "all_frames": true,
+            "all_frames": false,
             "run_at": "document_end"
         }
     ],
