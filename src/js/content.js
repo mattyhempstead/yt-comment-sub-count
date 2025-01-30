@@ -35,11 +35,8 @@
    * If the comment already has a sub count, this is removed first.
    * @param {HTMLElement} commentElement an element which contains a single comment
    */
-  const addCommentSubCount = async commentElement => {
-    // The query selector below handles a case detected on 2024-06-19.
-    // You should be able to remove the old case below after some time has passed from this date.
-    const newCommentStructure = !commentElement.querySelector('div#author-thumbnail > a').href;
-    const channelUrlLookup = newCommentStructure ? 'div#header-author a' : 'div#author-thumbnail > a';
+  const addCommentSubCount = async (commentElement) => {
+    const channelUrlLookup = 'div#header-author a';
     const commentHeaderElement = commentElement.querySelector('div#header-author');
 
     // Remove any existing subscriber counts
