@@ -8,6 +8,12 @@
    * Should be of the form: https://www.youtube.com/channel/<channel id>
    */
   const getSubs = async (channelUrl) => {
+    // It appears that occasionally the channelUrl is missing the https:// prefix.
+    // As of 2025-01-31, this occurs on community post comments.
+    if (channelUrl.startsWith('http://')) {
+      channelUrl = channelUrl.replace('http://', 'https://');
+    }
+
     const response = await fetch(channelUrl + '/about');
     const text = await response.text();
 
